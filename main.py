@@ -27,6 +27,19 @@ def findEncoding(images):
         encode.append(en)
     return encode
 
+def makkAttendance(name):
+    with open('Attendance.csv', 'r+') as f:
+        myDataList=f.readlines()
+        nameList=[]
+        for line in myDataList:
+            entry = line.split(',')
+            nameList.append(entry[0])
+        if name not in nameList:
+            now = datetime.now()
+            dt = now.strftime('%H:%M:%S')
+            f.writelines(f'\n{name},{dt}')
+
+
 encodeList=findEncoding(images)
 print("Encoding Completed")
 
@@ -37,8 +50,8 @@ while True:
     imgS=cv2.resize(img,(0,0),None,0.25,0.25)
     imgS=cv2.cvtColor(imgS,cv2.COLOR_BGR2RGB)
 
-    currFaceLoc=face_recognition.face_locations(imgS)[0]
-    currFaceEncode=face_recognition.face_encodings(imgS)[0]
+    currFaceLoc=face_recognition.face_locations(imgS)
+    currFaceEncode=face_recognition.face_encodings(imgS)
 
     for faceLoc,faceEncode in zip(currFaceLoc,currFaceEncode):
         match=face_recognition.compare_faces(encodeList,faceEncode)
@@ -55,5 +68,7 @@ while True:
             cv2.putText(img,name,(x1+6,y2-6),cv2.FONT_HERSHEY_COMPLEX,1,(255,255,255),2)
 
 
+
     cv2.imshow('webcam',img)
-    cv2.waitKey(1)
+    if cv2.waitKey(1) & 0xFF==ord("q"):
+        break
